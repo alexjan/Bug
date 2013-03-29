@@ -11,7 +11,7 @@
 #define dly400n dly200n;dly200n
 #define dly2u dly400n;dly400n;dly400n;dly400n;dly400n
 #define DelayDivisor 1
-#define WaitFor1Us asm("nop"); asm("nop")
+#define WaitFor1Us asm("nop")
 #define Jumpback asm("goto $ - 3")
 /*****************************************************
  *               End of defination                   *
@@ -20,9 +20,12 @@ extern unsigned char delayus_variable;
 
 #define DelayUs(x) { \
 			delayus_variable=(unsigned char)(x/DelayDivisor); \
-			WaitFor1Us; } \
+			WaitFor1Us;  \
 			asm("decfsz _delayus_variable,f"); \
-			Jumpback;
+			Jumpback;  \
+                        asm ("nop"); \
+                   }
+
 
 #define LOOP_CYCLES_CHAR	9							//how many cycles per loop, optimizations on
 #define timeout_char_us(x)	(long)(((x)/LOOP_CYCLES_CHAR)*(PIC_CLK/1000000/4))

@@ -40,10 +40,10 @@ void DelayMs(unsigned char cnt)
 	unsigned char	i;
 	do {
 		i = 4;
-		do {
+		do{
 			DelayUs(250);
 			CLRWDT();
-		} while(--i);
+		   } while (i--); 
 	} while(--cnt);
 }
 
