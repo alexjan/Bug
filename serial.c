@@ -10,21 +10,33 @@
 #define SPBRG_SET 129        			// for FOSC 20MHz
 #define BRGH_SET 1          			// for error 0.16
 #define DEnable  RC5
-
+	
 
 void serial_setup(void){
+	TRISC = 0b11011000;
+//			  ||+------ Config for USART RD/WR bit only OUT
+//			  |+------- Config for USART TxD only IN
+//			  +-------- Config for UASRT RxD only IN
+	TXSTA = 0b00100100;
+//			  |||||||+-TX9D
+//			  ||||||+--TRMT
+//			  |||||+---BRGH
+//			  ||||+----Unimpl
+//			  |||+-----SYNC
+//			  ||+------TXEN
+//			  |+-------TX9
+//			  +--------CSRC
+	RCSTA = 0b10010000;
+//			  |||||||+-RX9D
+//			  ||||||+--OERR
+//			  |||||+---FERR
+//			  ||||+----ADDEN
+//			  |||+-----CREN
+//			  ||+------SREN
+//			  |+-------RX9
+//			  +--------SPEN
+	INTCON = 0b00000000; 
 	SPBRG = SPBRG_SET;
-	BRGH = BRGH_SET;	  				//data rate for sending/receiving
-	SYNC = 0;						//asynchronous
-	SPEN = 1;						//enable serial port pins
-	CREN = 1;						//enable reception
-	SREN = 0;						//no effect
-	TXIE = 0;						//disable tx interrupts
-	RCIE = 0;						//disable rx interrupts
-	TX9 = 0;						//8-bit transmission
-	RX9 = 0;						//8-bit reception
-	TXEN = 0;						//reset transmitter
-	TXEN = 1;						//enable the transmitter
 }
 
 //unsigned char dummy;
@@ -32,7 +44,7 @@ void serial_setup(void){
 #define clear_usart_errors_inline	\
 if (OERR)				\
 {					\
-    unsigned char temp;			\
+    unsigned char temp;		\
     temp = RCREG;                       \
     CREN=0;				\
     CREN=1;				\

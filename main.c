@@ -31,8 +31,10 @@ even if its never called
 #define 	Transmite 1
 #define 	Reader 0
 
+
     __CONFIG (WDTE_ON & FOSC_HS & PWRTE_ON & BOREN_OFF & LVP_OFF & CPD_OFF);
 
+//unsigned char Reciever = 0; 
 /*******************************************************************************
  *                                                                             *
  *                        B E G I N  M A I N                                   *
@@ -41,7 +43,8 @@ even if its never called
  ******************************************************************************/
 void main(void) {
 
-//unsigned char column,c;
+
+unsigned char column,c;
   
 /*******************************************************************************
  //flash lights on port C on dev board               for test applications 
@@ -54,15 +57,56 @@ void main(void) {
 *******************************************************************************/ 
     OPTION_REG = 0b00001111;
     serial_setup();
+    
     PORTC = 0;
-    TRISC = 0b10011000;
-    DEnable = 1;
-    while(1) {
-		putlf;    
-        putst("Serial tester program for PIC16F876A by Girko Alexandr\n");
-        putst("Starting up serial @ 9600 baud, N,8,1, no flow control ...\n ");
-		DelayMs(1);
+    TRISC = 0b11011000;
+    
+//    DEnable = 1;
+//    while(1) {
+//		putlf;    
+//		putst("Serial tester program for PIC16F876A by Girko Alexandr\n");
+//		putst("Starting up serial @ 9600 baud, N,8,1, no flow control ...\n ");
+//		DelayMs(1);
+//    }
+    
+   
 
+    while(1) {
+	    DEnable = 0;
+	    c = getch();
+		switch (c){
+			default:
+				Red = false;
+				Green = false;
+				Yellow = false;
+				break;
+			case 'R':
+				Red = true;
+				Green = false;
+				Yellow = false;
+				break;
+			case 'G':
+				Red = false;
+				Green = true;
+				Yellow = false;
+				break;
+			case 'Y':
+				Red = false;
+				Green = false;
+				Yellow = true;
+		}	
+		
+		DEnable = 1;
+		putch(c);
+		while(!TRMT)CLRWDT(); 
     }
 }
+
+/*
+void interrupt intfunc(void){
+	if (RCIF){
+		Reciever = RCREG;
+	}
+}
+*/
 

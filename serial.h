@@ -12,6 +12,6 @@ void putinthex(unsigned int c);
 void clear_buffer(void);
 
 #define putlf putst("\n") //put line feed
-
+#define puttab putst("    ") //put tabulation
 
 
