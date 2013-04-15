@@ -44,69 +44,67 @@ even if its never called
 void main(void) {
 
 
-unsigned char column,c;
-  
-/*******************************************************************************
- //flash lights on port C on dev board               for test applications 
-    while(1) {
-    PORTC=0x55;
-    DelayMs(500);
-    PORTC=0xAA;
-    DelayMs(500);
-    }
-*******************************************************************************/ 
+    unsigned char position,column,number,c,out;
+    unsigned short long buffer,temp;
     OPTION_REG = 0b00001111;
     serial_setup();
-    
     PORTC = 0;
-    TRISC = 0b11011000;
-    
-//    DEnable = 1;
-//    while(1) {
-//		putlf;    
-//		putst("Serial tester program for PIC16F876A by Girko Alexandr\n");
-//		putst("Starting up serial @ 9600 baud, N,8,1, no flow control ...\n ");
-//		DelayMs(1);
-//    }
-    
-   
-
+    DEnable = 1;
+    buffer = 0;
+	putlf;    
+	putst("Serial tester program for PIC16F876A by Girko Alexandr\n");
+   	putst("Starting up serial @ 9600 baud, N,8,1, no flow control ...\n");
+	position = 0;
+    buffer = 0;
+    putst("0000.00\n^\n");
+	while(!TRMT)CLRWDT();
     while(1) {
 	    DEnable = 0;
 	    c = getch();
-		switch (c){
-			default:
-				Red = false;
-				Green = false;
-				Yellow = false;
-				break;
-			case 'R':
-				Red = true;
-				Green = false;
-				Yellow = false;
-				break;
-			case 'G':
-				Red = false;
-				Green = true;
-				Yellow = false;
-				break;
-			case 'Y':
-				Red = false;
-				Green = false;
-				Yellow = true;
-		}	
-		
-		DEnable = 1;
-		putch(c);
-		while(!TRMT)CLRWDT(); 
+	    DEnable = 1;
+	    number = c - '0';
+	    if(number < 10){
+    	    if(!position--)position = 5;
+    	    temp = (unsigned short long)0x0F << (4 * position);
+    	    temp = ~temp;  
+    	    buffer &= temp;
+    	    buffer |= (unsigned short long)number << (4 * position); 
+    	    out = buffer >> 16;
+    	    putchhex(out);
+    	    out = buffer >> 8;
+    	    putchhex(out);
+    	    putch('.');
+    	    out = buffer & 0xFF;
+    	    putchhex(out);
+    	    putlf;
+    	    switch(position){
+        	    case 1:
+        	        putst("      ^");
+        	        break;
+        	    case 2:
+        	        putst("     ^");
+        	        break;
+        	    case 3:
+        	        putst("   ^");
+        	        break;
+        	    case 4:
+        	        putst("  ^");
+        	        break;
+        	    case 5:
+        	        putst(" ^");
+        	        break;
+        	    case 0:
+        	        putst("^");
+        	        break;
+        	}
+        	putlf;
+    		while(!TRMT)CLRWDT(); 
+    	} else if (c == 'r' || c == 'R' ) {
+    	    position = 0;
+    	    buffer = 0;
+            putst("0000.00\n^\n");
+    	    while(!TRMT)CLRWDT(); 
+    	}    	
     }
 }
-
-/*
-void interrupt intfunc(void){
-	if (RCIF){
-		Reciever = RCREG;
-	}
-}
-*/
 
